@@ -1,73 +1,140 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Daylight Saving Time Checker</title>
-<style>
-  body { font-family: Helvetica, Arial, sans-serif; padding: 20px; }
-  .container { max-width: 600px; margin: auto; }
-  .result { font-weight: bold; }
-</style>
+  <title>Daylight Saving Time Checker</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0;
+    }
+
+    .result {
+      font-weight: bold;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    p {
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h2>Is it Daylight Saving Time now?</h2>
-  <p>USA: <span id="usa-result" class="result"></span></p>
-  <p>Germany: <span id="germany-result" class="result"></span></p>
-</div>
+  <div class="container">
+    <h2>Is it Daylight Saving Time now?</h2>
+    <p>USA: <span id="usa-result" class="result"></span></p>
+    <p>Germany: <span id="germany-result" class="result"></span></p>
+    <div id="datetime" style="margin-top: 20px; font-size: 1.05em; color: #333;"></div>
+  </div>
 
-<script>
-  function isDST_USA() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const mar = new Date(year, 2, 1);
-    const nov = new Date(year, 10, 1);
+  <script>
+    function isDST_USA() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const mar = new Date(year, 2, 1);
+      const nov = new Date(year, 10, 1);
 
-    // Get the second Sunday in March
-    let startDST = new Date(mar.getTime());
-    const startDay = startDST.getDay();
-    const startDate = startDST.getDate();
-    if (startDay !== 0) {
-      startDST.setDate(startDate + (7 - startDay) + 7);
-    } else {
-      startDST.setDate(startDate + 7);
+      // Get the second Sunday in March
+      let startDST = new Date(mar.getTime());
+      const startDay = startDST.getDay();
+      const startDate = startDST.getDate();
+      if (startDay !== 0) {
+        startDST.setDate(startDate + (7 - startDay) + 7);
+      } else {
+        startDST.setDate(startDate + 7);
+      }
+
+      // Get the first Sunday in November
+      let endDST = new Date(nov.getTime());
+      const endDay = endDST.getDay();
+      const endDate = endDST.getDate();
+      if (endDay !== 0) {
+        endDST.setDate(endDate + (7 - endDay));
+      }
+
+      return now >= startDST && now < endDST;
     }
 
-    // Get the first Sunday in November
-    let endDST = new Date(nov.getTime());
-    const endDay = endDST.getDay();
-    const endDate = endDST.getDate();
-    if (endDay !== 0) {
-      endDST.setDate(endDate + (7 - endDay));
+    function isDST_Germany() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const mar = new Date(year, 2, 31);
+      const oct = new Date(year, 9, 31);
+
+      // Get the last Sunday in March
+      let startDST = new Date(mar.getTime());
+      const startDay = startDST.getDay();
+      const startDate = startDST.getDate();
+      startDST.setDate(startDate - startDay);
+
+      // Get the last Sunday in October
+      let endDST = new Date(oct.getTime());
+      const endDay = endDST.getDay();
+      const endDate = endDST.getDate();
+      endDST.setDate(endDate - endDay);
+
+      return now >= startDST && now < endDST;
     }
 
-    return now >= startDST && now < endDST;
-  }
+    document.getElementById('usa-result').textContent = isDST_USA() ? 'Yes' : 'No';
+    document.getElementById('germany-result').textContent = isDST_Germany() ? 'Yes' : 'No';
 
-  function isDST_Germany() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const mar = new Date(year, 2, 31);
-    const oct = new Date(year, 9, 31);
+    function getTimeZoneAbbr(date = new Date()) {
+      // Try to get the time zone abbreviation (works in most modern browsers)
+      const match = date.toLocaleTimeString(undefined, { timeZoneName: 'short' }).match(/\b([A-Z]{2,5})\b/);
+      return match ? match[1] : Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
 
-    // Get the last Sunday in March
-    let startDST = new Date(mar.getTime());
-    const startDay = startDST.getDay();
-    const startDate = startDST.getDate();
-    startDST.setDate(startDate - startDay);
+    function pad(n) {
+      return n < 10 ? '0' + n : n;
+    }
 
-    // Get the last Sunday in October
-    let endDST = new Date(oct.getTime());
-    const endDay = endDST.getDay();
-    const endDate = endDST.getDate();
-    endDST.setDate(endDate - endDay);
+    function getUTCOffsetStr(date = new Date()) {
+      const offsetMin = -date.getTimezoneOffset();
+      const sign = offsetMin >= 0 ? '+' : '-';
+      const absMin = Math.abs(offsetMin);
+      const hours = Math.floor(absMin / 60);
+      const mins = absMin % 60;
+      return `UTC${sign}${hours}` + (mins ? `:${pad(mins)}` : '');
+    }
 
-    return now >= startDST && now < endDST;
-  }
+    function getLocationString() {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const tzDisplay = tz.replace(/_/g, ' ');
+      const offset = getUTCOffsetStr();
+      return `${tzDisplay} | ${offset}`;
+    }
 
-  document.getElementById('usa-result').textContent = isDST_USA() ? 'Yes' : 'No';
-  document.getElementById('germany-result').textContent = isDST_Germany() ? 'Yes' : 'No';
-</script>
+    function updateDateTime() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = pad(now.getMonth() + 1);
+      const dd = pad(now.getDate());
+      const hh = pad(now.getHours());
+      const min = pad(now.getMinutes());
+      const ss = pad(now.getSeconds());
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+      const timeStr = `${hh}:${min}:${ss}`;
+      const locationStr = getLocationString();
+      document.getElementById('datetime').innerHTML =
+        `<strong>Your local time:</strong> ${dateStr} ${timeStr} (${locationStr})`;
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+  </script>
 
 </body>
+
 </html>
