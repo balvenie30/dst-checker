@@ -22,17 +22,18 @@ Notion does not support inline formulas or allow code execution in a block. I in
 
 ### Option 2. Live SVG Widget for Notion (Recommended)
 
-- **Why?**  Notion blocks JavaScript in embeds, so the static HTML approach won't update live. The Vercel SVG widget is server-rendered and always up-to-date.
+> **Why?**  
+  Notion blocks JavaScript in embeds, so the static HTML approach won't update live. The Vercel SVG widget is server-rendered and always up-to-date.
 
 #### Deploy to Vercel
 
 1. Clone this repo.
 2. Install the Vercel CLI:  
-   `npm install -g vercel`
+  `npm install -g vercel`
 3. Deploy:  
-   Run `vercel` in your project directory and follow the prompts.
+  Run `vercel` in your project directory and follow the prompts.
 4. After deployment, you'll get a URL like:  
-   `https://your-vercel-project.vercel.app/api/dst-widget`
+  `https://your-vercel-project.vercel.app/api/dst-widget`
 
 #### Embed in Notion
 
