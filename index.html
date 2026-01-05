@@ -35,7 +35,7 @@
   <div class="container">
     <h2>Is it Daylight Saving Time now?</h2>
     <p>USA: <span id="usa-result" class="result"></span></p>
-    <p>Germany: <span id="germany-result" class="result"></span></p>
+    <p>EU: <span id="eu-result" class="result"></span></p>
     <div id="datetime" style="margin-top: 20px; font-size: 1.05em; color: #333;"></div>
   </div>
 
@@ -67,7 +67,7 @@
       return now >= startDST && now < endDST;
     }
 
-    function isDST_Germany() {
+    function isDST_EU() {
       const now = new Date();
       const year = now.getFullYear();
       const mar = new Date(year, 2, 31);
@@ -89,7 +89,7 @@
     }
 
     document.getElementById('usa-result').textContent = isDST_USA() ? 'Yes' : 'No';
-    document.getElementById('germany-result').textContent = isDST_Germany() ? 'Yes' : 'No';
+    document.getElementById('eu-result').textContent = isDST_EU() ? 'Yes' : 'No';
 
     function getTimeZoneAbbr(date = new Date()) {
       // Try to get the time zone abbreviation (works in most modern browsers)
